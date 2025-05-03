@@ -31,6 +31,8 @@ API_KEY_ENV_VARS = {
     "deepseek": "DEEPSEEK_API_KEY",
     "ollama": None, # Ollama often runs locally without a key
     "localai": "LOCALAI_API_KEY",
+    "requesty":"ROUTER_API_KEY",
+    "chutes":"CHUTES_API_KEY",
 }
 
 PROVIDER_DEFAULTS = {
@@ -42,6 +44,9 @@ PROVIDER_DEFAULTS = {
     "deepseek": {"model": "deepseek-chat", "base_url": "https://api.deepseek.com/v1"},
     "ollama": {"model": "llama3", "base_url": "http://localhost:11434"},
     "localai": {"model": "gpt-3.5-turbo", "base_url": "http://localhost:8083/v1"},
+    "requesty": {"model": "google/gemini-2.5-pro-exp-03-25", "base_url": "https://router.requesty.ai/v1"},
+    "chutes": {"model": "deepseek-ai/DeepSeek-V3-0324", "base_url": "https://llm.chutes.ai/v1"},
+
 }
 
 # --- Helper Functions ---
@@ -141,6 +146,16 @@ def _initialize_openai_compatible(
     #         "HTTP-Referer": config.get("openrouter_http_referer", "YOUR_SITE_URL"),
     #         "X-Title": config.get("openrouter_x_title", "YOUR_APP_NAME"),
     #     }
+
+    if provider == "requesty":
+        client_params["default_headers"] = {
+            "Authorization": f"Bearer {api_key}"
+        }
+    elif provider == "chutes":
+        client_params["default_headers"] = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
     return ChatOpenAI(**client_params)
 
 
@@ -179,7 +194,7 @@ def get_llm_client(config: Dict[str, Any], role: str = "default") -> BaseChatMod
         # print(f"Attempting to initialize LLM client for provider: {provider}, model: {model_name or 'default'}, base_url: {base_url or 'provider default'}")
 
         # Provider-specific initialization
-        if provider in ["openai", "openrouter", "deepseek", "localai"]:
+        if provider in ["openai", "openrouter", "deepseek", "localai","requesty","chutes"]:
             defaults = PROVIDER_DEFAULTS[provider]
             # API key must exist for these providers (checked by _get_api_key)
             return _initialize_openai_compatible(
@@ -298,7 +313,7 @@ def list_available_providers() -> list[dict]:
 
         headers = {}
         if api_key:
-            if provider in ["openai", "openrouter", "deepseek", "localai", "mistral", "gemini"]:
+            if provider in ["openai", "openrouter", "deepseek", "localai", "mistral", "gemini","requesty","chutes"]:
                 headers["Authorization"] = f"Bearer {api_key}"
             elif provider == "anthropic":
                 headers["x-api-key"] = api_key

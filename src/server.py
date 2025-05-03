@@ -5,6 +5,7 @@ import os
 import logging
 import time
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 load_dotenv() # Load environment variables from .env file
 
 # --- Setup file logger ---
@@ -97,6 +98,17 @@ app = FastAPI(
     version="1.0",
     description="API Server for the LangGraph-based Document Translation Workflow. Provides endpoints to manage and track translation jobs.",
 )
+
+
+#  CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # --- Initialize database and start worker on startup ---
 @app.on_event("startup")

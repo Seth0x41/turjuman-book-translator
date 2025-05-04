@@ -2,7 +2,7 @@ document.addEventListener("alpine:init", () => {
   Alpine.data("translationApp", () => ({
     // --- State ---
     theme: localStorage.getItem("theme") || "light",
-    apiUrl: localStorage.getItem("apiUrl") || "http://localhost:8000", // Default API URL, load from storage
+    apiUrl: localStorage.getItem("apiUrl") || "/", // Default API URL, load from storage
     inputData: {
       original_content: "",
       config: {
